@@ -1,0 +1,45 @@
+{
+  "name": "serverless-openfaas",
+  "version": "1.0.0",
+  "description": "Provider plugin for the Serverless Framework v1.x which adds support for OpenFaaS.",
+  "main": "index.js",
+  "author": "Stephen Roberts",
+  "license": "MIT",
+  "repository": {
+    "git": "https://github.com/stephencroberts/serverless-openfaas"
+  },
+  "homepage": "https://github.com/stephencroberts/serverless-openfaas",
+  "keywords": [
+    "serverless",
+    "serverless framework",
+    "serverless applications",
+    "serverless modules",
+    "openfaas",
+    "iot",
+    "internet of things",
+    "serverless.com"
+  ],
+  "devDependencies": {
+    "eslint": "^5.15.1",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-jsdoc": "^4.2.0",
+    "eslint-watch": "^5.0.1",
+    "jsdoc": "^3.5.5",
+    "pre-commit": "^1.2.2",
+    "pre-push": "^0.1.1"
+  },
+  "scripts": {
+    "docs:build": "jsdoc . -r -c .jsdocrc.js -d docs",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "lint:watch": "esw --color -w . .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "pre-commit": [
+    "lint"
+  ],
+  "pre-push": [
+    "lint"
+  ]
+}
