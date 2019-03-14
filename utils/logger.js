@@ -8,9 +8,10 @@ class Logger {
    * @example
    * const myProcessLogger = new Logger('myprocess');
    * @param {string} name - name of the process using the logger
+   * @param {number} [color=random] - color code
    */
-  constructor(name) {
-    this.color = Math.floor(Math.random() * (7) + 31);
+  constructor(name, color) {
+    this.color = color || Math.floor(Math.random() * (7) + 31);
     this.name = name;
   }
 
