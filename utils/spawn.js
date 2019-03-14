@@ -34,7 +34,13 @@ const spawnPromise = (command, args = [], options = {}) => {
       }
     });
 
-    process.on('close', resolve);
+    process.on('close', (code) => {
+      if (code !== 0) {
+        reject(new Error(`${command} exited with code ${code}`));
+      } else {
+        resolve();
+      }
+    });
     process.on('error', reject);
   });
 

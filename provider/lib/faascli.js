@@ -1,9 +1,5 @@
-const { spawn } = require('child_process');
-
-/**
- * @typedef FaasCliPromise
- * @type Promise
- */
+const spawn = require('../../utils/spawn');
+const Logger = require('../../utils/logger');
 
 /**
  * Wrapper around the faas-cli, handling i/o and using promises
@@ -17,33 +13,14 @@ class FaasCli {
    * @example
    * exec('build', '--lang', 'node', '--handler', './handler', '--image', 'handler:latest');
    * @param {...string} args - args to pass to faas-cli
-   * @returns {FaasCliPromise}
+   * @returns {Promise}
    */
   static exec(...args) {
-    return new Promise((resolve, reject) => {
-      const faasCli = spawn('faas-cli', args, { stdio: 'pipe' });
-
-      let stdout = '';
-      faasCli.stdout.on('data', (data) => {
-        console.log(data.toString('utf8')); // eslint-disable-line no-console
-        stdout += data.toString('utf8');
-      });
-
-      let stderr = '';
-      faasCli.stderr.on('data', (data) => {
-        stderr += data.toString('utf8');
-      });
-
-      faasCli.on('close', (code) => {
-        if (code !== 0) {
-          reject(new Error(`${stdout}\n${stderr}`));
-        } else {
-          resolve();
-        }
-      });
-
-      faasCli.on('error', reject);
-    });
+    return spawn(
+      'faas-cli',
+      args,
+      { logger: new Logger('faas-cli', 33) },
+    ).promise;
   }
 
   /**
@@ -52,7 +29,7 @@ class FaasCli {
    * @example
    * build('--lang', 'node', '--handler', './handler', '--image', 'handler:latest');
    * @param {...string} args - args to pass to faas-cli
-   * @returns {FaasCliPromise}
+   * @returns {Promise}
    */
   build(...args) {
     return this.constructor.exec('build', ...args);

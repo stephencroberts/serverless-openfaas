@@ -66,7 +66,7 @@ class OpenFaasPackage {
    * Creates a docker image for the given function
    *
    * @param {Object} funcConfig - serverless function config object
-   * @returns {FaasCliPromise}
+   * @returns {Promise}
    */
   createDockerImage(funcConfig) {
     return this.provider.cli.build(
@@ -80,7 +80,7 @@ class OpenFaasPackage {
   /**
    * Creates docker images for all serverless functions
    *
-   * @returns {FaasCliPromise}
+   * @returns {Promise}
    */
   createDockerImages() {
     const functions = this.options.function
