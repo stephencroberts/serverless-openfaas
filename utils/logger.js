@@ -21,7 +21,9 @@ class Logger {
    * @param {string} message
    */
   log(message) {
-    process.stdout.write(`\x1b[0;${this.color}m[${this.name}]\t${message}\x1b[0m`);
+    message.toString('utf8').split('\n').forEach((line) => {
+      process.stdout.write(`\x1b[0;${this.color}m[${this.name}]\t${line}\x1b[0m\n`);
+    });
   }
 
   /**
@@ -30,7 +32,9 @@ class Logger {
    * @param {string} message
    */
   err(message) {
-    process.stderr.write(`\x1b[0;${this.color}m[${this.name}]\t${message}\x1b[0m`);
+    message.toString('utf8').split('\n').forEach((line) => {
+      process.stderr.write(`\x1b[0;${this.color}m[${this.name}]\t${line}\x1b[0m\n`);
+    });
   }
 }
 

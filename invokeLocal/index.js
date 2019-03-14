@@ -110,7 +110,7 @@ class OpenFaasInvokeLocal {
   static spawnFunction(image, args) {
     const docker = spawn(
       'docker',
-      ['run', '--rm', '--name', 'faasfn', ...args, image],
+      ['run', '--rm', '--name', 'faas-fn', ...args, image],
       { logger: new Logger('docker', 34) },
     );
 
@@ -140,7 +140,7 @@ class OpenFaasInvokeLocal {
         '-s',
         '-o', '/dev/null',
         '-w', '%{http_code}',
-        'http://faasfn:8080/_/health',
+        'http://faas-fn:8080/_/health',
       ],
       { stdio: 'pipe' },
     );
@@ -162,7 +162,7 @@ class OpenFaasInvokeLocal {
         'byrnedo/alpine-curl',
         '-sS',
         '-D', '-',
-        'http://faasfn:8080',
+        'http://faas-fn:8080',
       ],
       { stdio: 'pipe' },
     );
