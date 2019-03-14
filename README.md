@@ -1,5 +1,9 @@
 # serverless-openfaas
 
+Serverless Framework integration for OpenFaaS.
+
+### WARNING: This project is currently a work in progress and has only limited functionality!
+
 ## Pre-reqs
 
 * [Docker](https://www.docker.com)
