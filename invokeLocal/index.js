@@ -175,8 +175,6 @@ class OpenFaasInvokeLocal {
           ['-s', '-o', '/dev/null', '-w', '%{http_code}', `http://127.0.0.1:${port}/_/health`],
           { stdio: 'pipe' },
         );
-        // eslint-disable-next-line no-console
-        console.log(curl.status, curl.stdout ? curl.stdout.toString('utf8') : '');
         if (curl.status === 0 && curl.stdout && curl.stdout.toString('utf8') === '200') {
           clearInterval(pollInterval);
           this.constructor.spawnRequest({ hostname: '127.0.0.1', port }).then(exit).catch(exit);
