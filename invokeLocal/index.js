@@ -1,5 +1,7 @@
-const { spawn, spawnSync } = require('child_process');
+const { spawnSync } = require('child_process');
 const http = require('http');
+const spawn = require('../utils/spawn');
+const Logger = require('../utils/logger');
 
 /**
  * InvokeLocal plugin - `sls invoke local`
@@ -36,48 +38,6 @@ class OpenFaasInvokeLocal {
   }
 
   /**
-   * @typedef Spawn
-   * @property {Object} process - NodeJS ChildProcess
-   * @property {Promise} promise
-   */
-
-  /**
-   * Spawns an OpenFaaS function docker container
-   *
-   * @param {Object} params
-   * @param {number} params.port - host port
-   * @param {string} params.image - docker image
-   * @param {Array<string>} params.args - additional `docker run` arguments
-   * @returns {Spawn}
-   */
-  static spawnFunction({ port, image, args = [] }) {
-    let docker;
-    const promise = new Promise((resolve, reject) => {
-      docker = spawn(
-        'docker',
-        ['run', '--rm', '-p', `${port}:8080`, ...args, image],
-        { stdio: 'pipe' },
-      );
-
-      docker.stdout.on('data', (data) => {
-        process.stdout.write(`\x1b[34mdocker --> ${data.toString('utf8')}\x1b[0m`);
-      });
-
-      docker.stderr.on('data', (data) => {
-        process.stderr.write(`\x1b[34mdocker --> ${data.toString('utf8')}\x1b[0m`);
-      });
-
-      docker.on('close', resolve);
-      docker.on('error', reject);
-    });
-
-    return {
-      process: docker,
-      promise,
-    };
-  }
-
-  /**
    * Spawns an http request to the OpenFaaS function
    *
    * @param {Object} params
@@ -95,7 +55,7 @@ class OpenFaasInvokeLocal {
           const status = `HTTP/${res.httpVersion} ${res.statusCode} ${res.statusMessage}`;
           const headers = Object.entries(res.headers).map(([k, v]) => `${k} ${v}`).join('\n');
           const message = `\n${status}\n${headers}\n\n${rawData}`;
-          process.stdout.write(`\x1b[35mhttp --> ${message}\n\x1b[0m`);
+          new Logger('http').log(message);
           resolve();
         });
       }).on('error', reject);
@@ -149,7 +109,11 @@ class OpenFaasInvokeLocal {
       const args = this.constructor.getArgs(this.options, funcConfig);
 
       this.serverless.cli.log(`Starting docker image ${funcConfig.image} on host port ${port}`);
-      const service = this.constructor.spawnFunction({ port, image: funcConfig.image, args });
+      const service = spawn(
+        'docker',
+        ['run', '--rm', '-p', `${port}:8080`, ...args, funcConfig.image],
+        { logger: new Logger('docker') },
+      );
 
       // Handles stopping running processes and exits cleanly
       const exit = (err) => {
