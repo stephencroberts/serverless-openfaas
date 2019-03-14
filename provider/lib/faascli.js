@@ -54,8 +54,8 @@ class FaasCli {
    * @param {...string} args - args to pass to faas-cli
    * @returns {FaasCliPromise}
    */
-  static build(...args) {
-    return FaasCli.exec('build', ...args);
+  build(...args) {
+    return this.constructor.exec('build', ...args);
   }
 }
 
