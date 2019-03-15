@@ -1,6 +1,12 @@
 const { spawnSync } = require('child_process');
 const spawn = require('../utils/spawn');
 const Logger = require('../utils/logger');
+const { getArgs } = require('../utils/args');
+
+const DOCKER_RUN_FLAGS = [
+  '--env',
+  '--network',
+];
 
 /**
  * InvokeLocal plugin - `sls invoke local`
@@ -34,37 +40,6 @@ class OpenFaasInvokeLocal {
     this.hooks = {
       'invoke:local:invoke': this.invokeLocal.bind(this),
     };
-  }
-
-  /**
-   * Get an array of arguments to pass to the spawned process
-   * Ref: https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options
-   *
-   * @param {Object} slsOptions - serverless options, passed from command line
-   * @param {Object} funcConfig - function config object as defined in serverless.yml
-   * @returns {Array<string>} nodejs child_process.spawn args array
-   */
-  static getArgs(slsOptions, funcConfig) {
-    // Convert command-line --env to object of key/value pairs
-    const invokeEnv = [].concat(slsOptions.env || [])
-      .map(envar => envar.split('='))
-      .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {});
-
-    // Get env vars from function config
-    const funcEnv = funcConfig.environment || {};
-
-    // Merge envs, with command-line taking precendence
-    const env = { ...funcEnv, ...invokeEnv };
-
-    // Convert env object to array of args to pass to the spawned process
-    const args = Object.entries(env)
-      .map(([k, v]) => ['--env', `${k}=${v}`])
-      .reduce((acc, arg) => acc.concat(arg), []);
-
-    args.push('--network');
-    args.push(slsOptions.network || 'serverless-faas');
-
-    return args;
   }
 
   /**
@@ -175,11 +150,11 @@ class OpenFaasInvokeLocal {
    */
   invokeLocal() {
     return new Promise((resolve, reject) => {
-      const funcConfig = this.serverless.service.getFunction(this.options.function);
-      const args = OpenFaasInvokeLocal.getArgs(this.options, funcConfig);
+      const fnConfig = this.serverless.service.getFunction(this.options.function);
+      const args = getArgs(fnConfig, this.options, DOCKER_RUN_FLAGS);
 
-      this.serverless.cli.log(`Starting docker image ${funcConfig.image}`);
-      OpenFaasInvokeLocal.spawnFunction(funcConfig.image, args)
+      this.serverless.cli.log(`Starting docker image ${fnConfig.image}`);
+      OpenFaasInvokeLocal.spawnFunction(fnConfig.image, args)
         .then((func) => {
           const curlLogger = new Logger('curl', 35);
           const curl = OpenFaasInvokeLocal.spawnHttpRequestSync(this.options.network);

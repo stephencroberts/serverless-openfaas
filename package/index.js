@@ -1,3 +1,5 @@
+const { getArgs } = require('../utils/args');
+
 const FAAS_CLI_BUILD_FLAGS = [
   '--build-arg',
   '--build-option',
@@ -65,16 +67,11 @@ class OpenFaasPackage {
   /**
    * Creates a docker image for the given function
    *
-   * @param {Object} funcConfig - serverless function config object
+   * @param {Object} fnConfig - serverless function config object
    * @returns {Promise}
    */
-  createDockerImage(funcConfig) {
-    return this.provider.cli.build(
-      // Filter/map function config object to cli flags, returning an array of cli arguments
-      ...Object.entries(funcConfig)
-        .map(([k, v]) => (FAAS_CLI_BUILD_FLAGS.includes(`--${k}`) ? [`--${k}`, v] : []))
-        .reduce((args, arg) => args.concat(arg), []),
-    );
+  createDockerImage(fnConfig) {
+    return this.provider.cli.build(...getArgs(fnConfig, this.options, FAAS_CLI_BUILD_FLAGS));
   }
 
   /**
