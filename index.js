@@ -1,6 +1,7 @@
 const OpenFaasProvider = require('./provider');
 const OpenFaasPackage = require('./package/index');
 const OpenFaasInvokeLocal = require('./invokeLocal');
+const OpenFaasDeploy = require('./deploy');
 
 /**
  * Super plugin for OpenFaas -- loads all of the other plugins
@@ -14,6 +15,7 @@ class OpenFaasIndex {
     this.serverless.pluginManager.addPlugin(OpenFaasProvider);
     this.serverless.pluginManager.addPlugin(OpenFaasPackage);
     this.serverless.pluginManager.addPlugin(OpenFaasInvokeLocal);
+    this.serverless.pluginManager.addPlugin(OpenFaasDeploy);
   }
 }
 
