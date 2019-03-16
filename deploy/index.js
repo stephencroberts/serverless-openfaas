@@ -33,16 +33,13 @@ class OpenFaasDeploy {
 
     this.commands = {
       deploy: {
-        usage: 'Deploy a Serverless service to OpenFaaS',
-        lifecycleEvents: [
-          'deploy:deploy',
-        ],
+        usage: 'Deploy OpenFaaS function containers',
         options: {
           env: {
             usage: 'Environment variable (key=value)',
           },
           function: {
-            usage: 'Function name. Deploys a single function (see \'deploy function\')',
+            usage: 'Function name -- deploys a single function container (see \'deploy function\')',
             shortcut: 'f',
           },
           gateway: {

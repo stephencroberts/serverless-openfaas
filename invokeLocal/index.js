@@ -22,13 +22,10 @@ class OpenFaasInvokeLocal {
       invoke: {
         commands: {
           local: {
-            usage: 'Invoke function locally',
-            lifecycleEvents: [
-              'invoke:local:invoke',
-            ],
+            usage: 'Invokes an OpenFaaS function container locally',
             options: {
               network: {
-                usage: 'Docker network to attach to',
+                usage: 'Docker network to attach the function container to',
                 shortcut: 'n',
               },
             },

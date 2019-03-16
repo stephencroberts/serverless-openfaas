@@ -26,13 +26,10 @@ class OpenFaasPackage {
 
     this.commands = {
       package: {
-        usage: 'Packages serverless functions as a docker images',
-        lifecycleEvents: [
-          'package:createDeploymentArtifacts',
-        ],
+        usage: 'Builds OpenFaaS function containers',
         options: {
           function: {
-            usage: 'Function name -- packages a single function',
+            usage: 'Function name -- builds a single function container',
             shortcut: 'f',
           },
           image: {

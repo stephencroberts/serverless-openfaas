@@ -21,7 +21,7 @@ class OpenFaasDeployList {
           list: {
             usage: 'Lists OpenFaaS functions',
             lifecycleEvents: [
-              'log',
+              'list',
             ],
           },
         },
@@ -29,7 +29,7 @@ class OpenFaasDeployList {
     };
 
     this.hooks = {
-      'deploy:list:log': this.list.bind(this),
+      'deploy:list:list': this.list.bind(this),
     };
   }
 
