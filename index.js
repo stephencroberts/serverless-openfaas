@@ -3,6 +3,7 @@ const OpenFaasPackage = require('./package/index');
 const OpenFaasInvoke = require('./invoke');
 const OpenFaasInvokeLocal = require('./invokeLocal');
 const OpenFaasDeploy = require('./deploy');
+const OpenFaasDeployFunction = require('./deployFunction');
 const OpenFaasDeployList = require('./deployList');
 
 /**
@@ -19,6 +20,7 @@ class OpenFaasIndex {
     this.serverless.pluginManager.addPlugin(OpenFaasInvoke);
     this.serverless.pluginManager.addPlugin(OpenFaasInvokeLocal);
     this.serverless.pluginManager.addPlugin(OpenFaasDeploy);
+    this.serverless.pluginManager.addPlugin(OpenFaasDeployFunction);
     this.serverless.pluginManager.addPlugin(OpenFaasDeployList);
   }
 }

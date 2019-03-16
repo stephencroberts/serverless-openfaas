@@ -1,26 +1,3 @@
-const { getArgs } = require('../utils/args');
-
-const FAAS_CLI_DEPLOY_FLAGS = [
-  '--annotation',
-  '--constraint',
-  '--env',
-  '--fprocess',
-  '--gateway',
-  '--handler',
-  '--image',
-  '--label',
-  '--lang',
-  '--name',
-  '--network',
-  '--readonly',
-  '--replace',
-  '--secret',
-  '--send-registry-auth',
-  '--tag',
-  '--tls-no-verify',
-  '--update',
-];
-
 /**
  * Deploy plugin - `sls deploy`
  * @class
@@ -71,15 +48,12 @@ class OpenFaasDeploy {
       ? [].concat(this.options.function || [])
       : this.serverless.service.getAllFunctions();
 
-    return Promise.all(functions
-      .map(funcName => this.provider.cli.deploy(
-        ...getArgs(
-          this.serverless.service.provider,
-          this.serverless.service.getFunction(funcName),
-          this.options,
-          FAAS_CLI_DEPLOY_FLAGS,
-        ),
-      ).promise));
+    return Promise.all(
+      functions.map((funcName) => {
+        this.options.function = funcName;
+        return this.serverless.pluginManager.spawn('deploy:function');
+      }),
+    );
   }
 }
 
