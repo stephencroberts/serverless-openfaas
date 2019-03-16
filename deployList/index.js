@@ -45,7 +45,7 @@ class OpenFaasDeployList {
         this.options,
         FAAS_CLI_LIST_FLAGS,
       ),
-    );
+    ).promise;
   }
 }
 

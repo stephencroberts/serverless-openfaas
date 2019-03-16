@@ -79,7 +79,7 @@ class OpenFaasDeploy {
           this.options,
           FAAS_CLI_DEPLOY_FLAGS,
         ),
-      )));
+      ).promise));
   }
 }
 

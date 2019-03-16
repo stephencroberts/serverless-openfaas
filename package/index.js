@@ -68,7 +68,9 @@ class OpenFaasPackage {
    * @returns {Promise}
    */
   createDockerImage(fnConfig) {
-    return this.provider.cli.build(...getArgs(fnConfig, this.options, FAAS_CLI_BUILD_FLAGS));
+    return this.provider.cli.build(
+      ...getArgs(fnConfig, this.options, FAAS_CLI_BUILD_FLAGS),
+    ).promise;
   }
 
   /**
