@@ -5,6 +5,7 @@ const OpenFaasInvokeLocal = require('./invokeLocal');
 const OpenFaasDeploy = require('./deploy');
 const OpenFaasDeployFunction = require('./deployFunction');
 const OpenFaasDeployList = require('./deployList');
+const OpenFaasDeployListFunctions = require('./deployListFunctions');
 
 /**
  * Super plugin for OpenFaas -- loads all of the other plugins
@@ -22,6 +23,7 @@ class OpenFaasIndex {
     this.serverless.pluginManager.addPlugin(OpenFaasDeploy);
     this.serverless.pluginManager.addPlugin(OpenFaasDeployFunction);
     this.serverless.pluginManager.addPlugin(OpenFaasDeployList);
+    this.serverless.pluginManager.addPlugin(OpenFaasDeployListFunctions);
   }
 }
 

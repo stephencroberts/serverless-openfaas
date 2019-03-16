@@ -1,12 +1,5 @@
-const { getArgs } = require('../utils/args');
-
-const FAAS_CLI_LIST_FLAGS = [
-  '--gateway',
-  '--tls-noverify',
-];
-
 /**
- * Deploy plugin - `sls deploy list`
+ * DeployList plugin - `sls deploy list`
  * @class
  */
 class OpenFaasDeployList {
@@ -34,18 +27,12 @@ class OpenFaasDeployList {
   }
 
   /**
-   * Deploys a Serverless service to OpenFaaS
+   * Lists OpenFaaS functions
    *
    * @returns {Promise}
    */
   list() {
-    return this.provider.cli.list(
-      ...getArgs(
-        this.serverless.service.provider,
-        this.options,
-        FAAS_CLI_LIST_FLAGS,
-      ),
-    ).promise;
+    return this.serverless.pluginManager.spawn('deploy:list:functions');
   }
 }
 
