@@ -38,13 +38,21 @@ class FaasCli {
   /**
    * Deploys OpenFaaS function containers
    *
-   * @example
-   * deploy();
    * @param {...string} args - args to pass to faas-cli
    * @returns {Promise}
    */
   deploy(...args) {
     return this.constructor.exec('deploy', ...args);
+  }
+
+  /**
+   * Lists OpenFaaS functions
+   *
+   * @param {...string} args - args to pass to faas-cli
+   * @returns {Promise}
+   */
+  list(...args) {
+    return this.constructor.exec('list', ...args);
   }
 }
 
