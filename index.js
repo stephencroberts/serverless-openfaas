@@ -7,6 +7,7 @@ const OpenFaasDeployFunction = require('./deployFunction');
 const OpenFaasDeployList = require('./deployList');
 const OpenFaasDeployListFunctions = require('./deployListFunctions');
 const OpenFaasInfo = require('./info');
+const OpenFaasLogs = require('./logs');
 
 /**
  * Super plugin for OpenFaas -- loads all of the other plugins
@@ -26,6 +27,7 @@ class OpenFaasIndex {
     this.serverless.pluginManager.addPlugin(OpenFaasDeployList);
     this.serverless.pluginManager.addPlugin(OpenFaasDeployListFunctions);
     this.serverless.pluginManager.addPlugin(OpenFaasInfo);
+    this.serverless.pluginManager.addPlugin(OpenFaasLogs);
   }
 }
 
