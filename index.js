@@ -8,6 +8,8 @@ const OpenFaasDeployList = require('./deployList');
 const OpenFaasDeployListFunctions = require('./deployListFunctions');
 const OpenFaasInfo = require('./info');
 const OpenFaasLogs = require('./logs');
+const OpenFaasRollback = require('./rollback');
+const OpenFaasRollbackFunction = require('./rollbackFunction');
 
 /**
  * Super plugin for OpenFaas -- loads all of the other plugins
@@ -28,6 +30,8 @@ class OpenFaasIndex {
     this.serverless.pluginManager.addPlugin(OpenFaasDeployListFunctions);
     this.serverless.pluginManager.addPlugin(OpenFaasInfo);
     this.serverless.pluginManager.addPlugin(OpenFaasLogs);
+    this.serverless.pluginManager.addPlugin(OpenFaasRollback);
+    this.serverless.pluginManager.addPlugin(OpenFaasRollbackFunction);
   }
 }
 
