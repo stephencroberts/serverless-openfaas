@@ -8,6 +8,10 @@ const DOCKER_RUN_FLAGS = [
   '--network',
 ];
 
+const CURL_FLAGS = [
+  '--data',
+];
+
 /**
  * InvokeLocal plugin - `sls invoke local`
  * @class
@@ -27,6 +31,10 @@ class OpenFaasInvokeLocal {
               network: {
                 usage: 'Docker network to attach the function container to',
                 shortcut: 'n',
+              },
+              data: {
+                usage: 'Input data',
+                shortcut: 'd',
               },
             },
           },
@@ -57,6 +65,8 @@ class OpenFaasInvokeLocal {
         if (curl.status === 0 && curl.stdout && curl.stdout.toString('utf8') === '200') {
           clearInterval(pollInterval);
           resolve();
+        } else if (curl.stderr) {
+          logger.err(curl.stderr.toString('utf8'));
         }
 
         timeout -= 1;
@@ -121,23 +131,69 @@ class OpenFaasInvokeLocal {
   /**
    * Spawns an http request process (curl in a docker container) synchronously
    *
-   * @param {string} network - docker network
+   * @param {string[]} [dockerArgs=[]]
+   * @param {string[]} [curlArgs=[]]
    * @returns {Object} NodeJS child_process.spawnSync return value
    */
-  static spawnHttpRequestSync(network) {
+  static spawnHttpRequestSync(dockerArgs = [], curlArgs = []) {
     return spawnSync(
       'docker',
       [
         'run',
         '--rm',
-        '--network', network,
+        ...dockerArgs,
         'byrnedo/alpine-curl',
         '-sS',
         '-D', '-',
+        ...curlArgs,
         'http://faas-fn:8080',
       ],
       { stdio: 'pipe' },
     );
+  }
+
+  /**
+   * Spawns a docker process to create a new network synchronously
+   *
+   * @param {string} network - docker network
+   * @returns {Object} NodeJS child_process.spawnSync return value
+   */
+  static spawnDockerNetwork(network) {
+    return spawnSync(
+      'docker',
+      [
+        'network',
+        'create',
+        network,
+      ],
+    );
+  }
+
+  /**
+   * Spawns a docker process to remove a network synchronously
+   *
+   * @param {string} network - docker network
+   * @returns {Object} NodeJS child_process.spawnSync return value
+   */
+  static killDockerNetwork(network) {
+    return spawnSync(
+      'docker',
+      [
+        'network',
+        'rm',
+        network,
+      ],
+    );
+  }
+
+  /**
+   * Cleans up any resources before exiting
+   *
+   * @param {Object} params
+   * @param {string} [params.network] - docker network
+   */
+  static cleanup({ network }) {
+    if (network) { OpenFaasInvokeLocal.killDockerNetwork(network); }
   }
 
   /**
@@ -146,15 +202,23 @@ class OpenFaasInvokeLocal {
    * @returns {Promise}
    */
   invokeLocal() {
+    // Create a random docker network name
+    const s = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    const defaultNetwork = Array(12).join().split(',')
+      .map(() => s.charAt(Math.floor(Math.random() * s.length)))
+      .join('');
+
     return new Promise((resolve, reject) => {
       const fnConfig = this.serverless.service.getFunction(this.options.function);
-      const args = getArgs(fnConfig, this.options, DOCKER_RUN_FLAGS);
+      const args = getArgs({ network: defaultNetwork }, fnConfig, this.options, DOCKER_RUN_FLAGS);
 
       this.serverless.cli.log(`Starting docker image ${fnConfig.image}`);
+      OpenFaasInvokeLocal.spawnDockerNetwork(defaultNetwork);
       OpenFaasInvokeLocal.spawnFunction(fnConfig.image, args)
         .then((func) => {
           const curlLogger = new Logger('curl', 35);
-          const curl = OpenFaasInvokeLocal.spawnHttpRequestSync(this.options.network);
+          const curlArgs = getArgs(this.options, CURL_FLAGS);
+          const curl = OpenFaasInvokeLocal.spawnHttpRequestSync(args, curlArgs);
           if (curl.status === 0 && curl.stdout) {
             curlLogger.log(curl.stdout);
           } else if (curl.stderr) {
@@ -163,7 +227,15 @@ class OpenFaasInvokeLocal {
           func.process.kill();
           func.promise.then(resolve).catch(reject);
         });
-    });
+    })
+      .then((result) => {
+        OpenFaasInvokeLocal.cleanup({ network: defaultNetwork });
+        return result;
+      })
+      .catch((err) => {
+        OpenFaasInvokeLocal.cleanup({ network: defaultNetwork });
+        throw err;
+      });
   }
 }
 
