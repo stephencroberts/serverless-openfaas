@@ -12,6 +12,7 @@ const DOCKER_RUN_FLAGS = [
 
 const CURL_FLAGS = [
   '--data',
+  '--header',
 ];
 
 /**
