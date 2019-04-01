@@ -1,4 +1,5 @@
 const { spawnSync } = require('child_process');
+const path = require('path');
 const spawn = require('../utils/spawn');
 const Logger = require('../utils/logger');
 const { getArgs } = require('../utils/args');
@@ -6,6 +7,7 @@ const { getArgs } = require('../utils/args');
 const DOCKER_RUN_FLAGS = [
   '--env',
   '--network',
+  '--volume',
 ];
 
 const CURL_FLAGS = [
@@ -210,7 +212,11 @@ class OpenFaasInvokeLocal {
 
     return new Promise((resolve, reject) => {
       const fnConfig = this.serverless.service.getFunction(this.options.function);
-      const args = getArgs({ network: defaultNetwork }, fnConfig, this.options, DOCKER_RUN_FLAGS);
+      const dockerArgs = {
+        network: defaultNetwork,
+        volume: `${path.join(process.cwd(), fnConfig.handler)}:/home/app/function`,
+      };
+      const args = getArgs(dockerArgs, fnConfig, this.options, DOCKER_RUN_FLAGS);
 
       this.serverless.cli.log(`Starting docker image ${fnConfig.image}`);
       OpenFaasInvokeLocal.spawnDockerNetwork(defaultNetwork);
