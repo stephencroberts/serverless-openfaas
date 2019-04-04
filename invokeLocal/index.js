@@ -1,4 +1,5 @@
 const { spawnSync } = require('child_process');
+const fs = require('fs');
 const path = require('path');
 const spawn = require('../utils/spawn');
 const Logger = require('../utils/logger');
@@ -34,6 +35,10 @@ class OpenFaasInvokeLocal {
               network: {
                 usage: 'Docker network to attach the function container to',
                 shortcut: 'n',
+              },
+              path: {
+                usage: 'Path to JSON or YAML file holding input data',
+                shortcut: 'p',
               },
               data: {
                 usage: 'Input data',
@@ -223,8 +228,15 @@ class OpenFaasInvokeLocal {
       OpenFaasInvokeLocal.spawnDockerNetwork(defaultNetwork);
       OpenFaasInvokeLocal.spawnFunction(fnConfig.image, args)
         .then((func) => {
+          const customArgs = {};
+          if (this.options.path) {
+            const dataPath = path.join(process.cwd(), this.options.path);
+            if (fs.existsSync(dataPath)) {
+              customArgs.data = fs.readFileSync(dataPath).toString('utf8');
+            }
+          }
           const curlLogger = new Logger('curl', 35);
-          const curlArgs = getArgs(this.options, CURL_FLAGS);
+          const curlArgs = getArgs(customArgs, this.options, CURL_FLAGS);
           const curl = OpenFaasInvokeLocal.spawnHttpRequestSync(args, curlArgs);
           if (curl.status === 0 && curl.stdout) {
             curlLogger.log(curl.stdout);
