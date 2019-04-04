@@ -48,12 +48,11 @@ class OpenFaasDeploy {
       ? [].concat(this.options.function || [])
       : this.serverless.service.getAllFunctions();
 
-    return Promise.all(
-      functions.map((funcName) => {
-        this.options.function = funcName;
-        return this.serverless.pluginManager.spawn('deploy:function');
-      }),
-    );
+    return functions.reduce((promiseChain, funcName) => promiseChain.then(() => {
+      this.options.function = funcName;
+      return this.serverless.pluginManager.spawn('deploy:function');
+    }),
+    Promise.resolve());
   }
 }
 
