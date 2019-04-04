@@ -1,4 +1,6 @@
 const { getArgs } = require('../utils/args');
+const Logger = require('../utils/logger');
+const spawn = require('../utils/spawn');
 
 const FAAS_CLI_DEPLOY_FLAGS = [
   '--annotation',
@@ -69,14 +71,19 @@ class OpenFaasDeploy {
    * @returns {Promise}
    */
   deployFunction() {
-    return this.provider.cli.deploy(
+    const fnConfig = this.serverless.service.getFunction(this.options.function);
+    return spawn(
+      'docker',
+      ['push', fnConfig.image],
+      { logger: new Logger('faas-cli', 33) },
+    ).promise.then(() => this.provider.cli.deploy(
       ...getArgs(
         this.serverless.service.provider,
-        this.serverless.service.getFunction(this.options.function),
+        fnConfig,
         this.options,
         FAAS_CLI_DEPLOY_FLAGS,
       ),
-    ).promise;
+    ).promise);
   }
 }
 
