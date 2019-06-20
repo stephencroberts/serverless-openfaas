@@ -1,5 +1,5 @@
 const parseOptionsEnv = optionsEnv => [].concat(optionsEnv || [])
-  .map(opt => opt.split('='))
+  .map(opt => opt.split(/=(.+)/))
   .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {});
 
 const parseFnEnv = fnEnv => Object.entries(fnEnv)
